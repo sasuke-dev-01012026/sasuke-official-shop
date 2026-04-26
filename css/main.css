@@ -651,12 +651,10 @@ main {
 =========================== */
 .shop-cat-filters {
   display: flex;
-  /* pastikan flex aktif */
   overflow-x: auto;
   flex-wrap: nowrap;
-  /* ❗ kunci utama */
-  justify-content: center;
-  /* biar natural scroll */
+  justify-content: flex-start;
+  /* ← ganti dari center */
   padding-bottom: 4px;
   -ms-overflow-style: none;
   scrollbar-width: none;
