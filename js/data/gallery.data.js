@@ -18,7 +18,7 @@ export const GALLERY = [
 
 // Urutan sesuai id di GALLERY (index = id - 1)
 export const GALLERY_IMGS = [
-  './assets/images/gallery/one_piece/01.png',      // Luffy
+  './assets/images/gallery/one_piece/01.jpg',      // Luffy
   './assets/images/gallery/naruto/01.png',         // Naruto
   './assets/images/gallery/dragonball/01.jpg',     // Goku
   './assets/images/gallery/bleach/01.png',         // Ichigo
