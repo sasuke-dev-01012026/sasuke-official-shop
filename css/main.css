@@ -324,18 +324,23 @@ main {
   margin: 0 auto;
 }
 
+/* Wrapper di luar .filters */
+.filters-wrap {
+  display: flex;
+  justify-content: center;
+}
+
 .filters {
   display: flex;
-    justify-content: flex-start;
-  /* biar mulai dari kiri */
+  justify-content: flex-start;
   gap: 10px;
   flex-wrap: nowrap;
-  /* ❗ jangan wrap */
   overflow-x: auto;
-  /* ❗ aktifkan scroll horizontal */
   margin-bottom: 44px;
   padding-bottom: 6px;
-  /* opsional biar enak dilihat */
+  scroll-behavior: smooth;
+  max-width: 100%;
+  /* biar tidak melar */
 }
 
 /* opsional: hilangin scrollbar biar lebih clean */
