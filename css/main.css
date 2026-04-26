@@ -326,7 +326,7 @@ main {
 
 .filters {
   display: flex;
-  justify-content: center;
+    justify-content: flex-start;
   /* biar mulai dari kiri */
   gap: 10px;
   flex-wrap: nowrap;
