@@ -21,7 +21,7 @@ export const GALLERY_IMGS = [
   './assets/images/gallery/one_piece/01.jpg',      // Luffy
   './assets/images/gallery/naruto/01.jpg',         // Naruto
   './assets/images/gallery/dragonball/01.jpg',     // Goku
-  './assets/images/gallery/bleach/01.png',         // Ichigo
+  './assets/images/gallery/bleach/01.jpg',         // Ichigo
   './assets/images/gallery/fairy_tail/01.png',     // Natsu
   './assets/images/gallery/other/01.png',          // Tanjiro
 ];
