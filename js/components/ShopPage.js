@@ -29,6 +29,7 @@ export class ShopPage {
             <button class="filter-btn" data-cat="casing">Casing HP</button>
             <button class="filter-btn" data-cat="poster">Poster</button>
             <button class="filter-btn" data-cat="gantungan">Gantungan Kunci</button>
+          <button class="filter-btn" data-cat="aksesoris">Aksesoris Lainnya</button>
           </div>
           <div class="series-divider" id="divider-op">
             <span class="series-name">One Piece</span>
