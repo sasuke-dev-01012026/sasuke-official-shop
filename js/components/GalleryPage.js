@@ -59,10 +59,16 @@ export class GalleryPage {
   /** Render the gallery grid + pagination */
   renderGrid() {
     const items = this.#filtered();
-    const total = Math.ceil(items.length / PER_PAGE);
-    const start = (this.#currentPage - 1) * PER_PAGE;
-    const pageItems = items.slice(start, start + PER_PAGE);
-    const grid = document.getElementById('gallery-grid');
+
+    // Expand: karakter dengan banyak gambar jadi beberapa item
+    const expanded = items.flatMap((item) =>
+      getImgs(item.id).map((src, imgIdx) => ({ ...item, src, imgIdx }))
+    );
+
+    const total     = Math.ceil(expanded.length / PER_PAGE);
+    const start     = (this.#currentPage - 1) * PER_PAGE;
+    const pageItems = expanded.slice(start, start + PER_PAGE);
+    const grid      = document.getElementById('gallery-grid');
 
     grid.innerHTML = '';
 
@@ -73,10 +79,8 @@ export class GalleryPage {
     }
 
     pageItems.forEach((item, idx) => {
-      const src    = getCoverImg(item.id) || FALLBACK_GALLERY(item.id); // ✅ selalu string
-      const allImg = getImgs(item.id);                                  // ✅ array semua gambar
-
-      const el = document.createElement('div');
+      const src = item.src || FALLBACK_GALLERY(item.id);
+      const el  = document.createElement('div');
       el.className = 'g-item';
       el.style.animationDelay = (idx * 0.055) + 's';
       el.innerHTML = `
@@ -95,7 +99,7 @@ export class GalleryPage {
             <line x1="8"  y1="11" x2="14"    y2="11"/>
           </svg>
         </div>`;
-      el.addEventListener('click', () => this.#lightbox.open(allImg, item.label, item.series));
+      el.addEventListener('click', () => this.#lightbox.open(src, item.label, item.series));
       grid.appendChild(el);
     });
 
@@ -105,42 +109,4 @@ export class GalleryPage {
   // --- Private helpers ---
 
   #filtered() {
-    return this.#currentFilter === 'all'
-      ? GALLERY
-      : GALLERY.filter(i => i.category === this.#currentFilter);
-  }
-
-  #renderPagination(total) {
-    const container = document.getElementById('pagination');
-    container.innerHTML = '';
-    if (total <= 1) return;
-
-    const prev = document.createElement('button');
-    prev.className = 'pg-arrow';
-    prev.innerHTML = '&#8592;';
-    prev.disabled = this.#currentPage === 1;
-    prev.addEventListener('click', () => this.#goPage(this.#currentPage - 1));
-    container.appendChild(prev);
-
-    for (let i = 1; i <= total; i++) {
-      const btn = document.createElement('button');
-      btn.className = `pg-btn${i === this.#currentPage ? ' active' : ''}`;
-      btn.textContent = i;
-      btn.addEventListener('click', () => this.#goPage(i));
-      container.appendChild(btn);
-    }
-
-    const next = document.createElement('button');
-    next.className = 'pg-arrow';
-    next.innerHTML = '&#8594;';
-    next.disabled = this.#currentPage === total;
-    next.addEventListener('click', () => this.#goPage(this.#currentPage + 1));
-    container.appendChild(next);
-  }
-
-  #goPage(n) {
-    this.#currentPage = n;
-    this.renderGrid();
-    document.getElementById('gallery-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-}
+    return this.#currentFilter ==
