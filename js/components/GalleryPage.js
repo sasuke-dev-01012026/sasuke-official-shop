@@ -1,5 +1,5 @@
 // js/components/GalleryPage.js
-import { GALLERY, GALLERY_IMGS, FALLBACK_GALLERY } from '../data/gallery.data.js';
+import { GALLERY, FALLBACK_GALLERY, getCoverImg, getImgs } from '../data/gallery.data.js';
 
 const PER_PAGE = 9;
 
@@ -73,7 +73,9 @@ export class GalleryPage {
     }
 
     pageItems.forEach((item, idx) => {
-      const src = GALLERY_IMGS[item.id - 1] || FALLBACK_GALLERY(item.id);
+      const src    = getCoverImg(item.id) || FALLBACK_GALLERY(item.id); // ✅ selalu string
+      const allImg = getImgs(item.id);                                  // ✅ array semua gambar
+
       const el = document.createElement('div');
       el.className = 'g-item';
       el.style.animationDelay = (idx * 0.055) + 's';
@@ -93,7 +95,7 @@ export class GalleryPage {
             <line x1="8"  y1="11" x2="14"    y2="11"/>
           </svg>
         </div>`;
-      el.addEventListener('click', () => this.#lightbox.open(src, item.label, item.series));
+      el.addEventListener('click', () => this.#lightbox.open(allImg, item.label, item.series));
       grid.appendChild(el);
     });
 
