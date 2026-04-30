@@ -30,7 +30,11 @@ export const GALLERY_IMGS = [
     './assets/images/gallery/naruto/02.jpg',
     './assets/images/gallery/naruto/03.jpg',
   ],
-  './assets/images/gallery/dragonball/01.png',               // Goku
+  [                                                           // Dragon Ball (3 gambar)
+    './assets/images/gallery/dragonball/01.png',
+    './assets/images/gallery/dragonball/02.png',
+    './assets/images/gallery/dragonball/03.png',
+  ],
   './assets/images/gallery/bleach/01.jpg',                   // Ichigo
   './assets/images/gallery/fairy_tail/01.png',               // Natsu
   './assets/images/gallery/other/01.png',                    // Tanjiro
