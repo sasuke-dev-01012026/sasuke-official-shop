@@ -36,9 +36,9 @@ export const GALLERY_IMGS = [
     './assets/images/gallery/dragonball/03.png',
   ],
   [ // Bleach (3 gambar) ✅ sudah jadi array
-    './assets/images/gallery/bleach/01.png',
-    './assets/images/gallery/bleach/02.png',
-    './assets/images/gallery/bleach/03.png',
+    './assets/images/gallery/bleach/01.jpg',
+    './assets/images/gallery/bleach/02.jpg',
+    './assets/images/gallery/bleach/03.jpg',
   ],
   './assets/images/gallery/fairy_tail/01.png', // Natsu
   './assets/images/gallery/other/01.png',      // Tanjiro
