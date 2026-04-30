@@ -20,24 +20,28 @@ export const GALLERY = [
 // Jika karakter punya lebih dari 1 gambar, gunakan array
 
 export const GALLERY_IMGS = [
-  [                                                           // Luffy (3 gambar)
+  [ // Luffy (3 gambar)
     './assets/images/gallery/one_piece/01.jpg',
     './assets/images/gallery/one_piece/02.jpg',
     './assets/images/gallery/one_piece/03.jpg',
   ],
-  [                                                           // Naruto (3 gambar)
+  [ // Naruto (3 gambar)
     './assets/images/gallery/naruto/01.jpg',
     './assets/images/gallery/naruto/02.jpg',
     './assets/images/gallery/naruto/03.jpg',
   ],
-  [                                                           // Dragon Ball (3 gambar)
+  [ // Dragon Ball (3 gambar)
     './assets/images/gallery/dragonball/01.png',
     './assets/images/gallery/dragonball/02.png',
     './assets/images/gallery/dragonball/03.png',
   ],
-  './assets/images/gallery/bleach/01.jpg',                   // Ichigo
-  './assets/images/gallery/fairy_tail/01.png',               // Natsu
-  './assets/images/gallery/other/01.png',                    // Tanjiro
+  [ // Bleach (3 gambar) ✅ sudah jadi array
+    './assets/images/gallery/bleach/01.jpg',
+    './assets/images/gallery/bleach/02.jpg',
+    './assets/images/gallery/bleach/03.jpg',
+  ],
+  './assets/images/gallery/fairy_tail/01.png', // Natsu
+  './assets/images/gallery/other/01.png',      // Tanjiro
 ];
 export const FALLBACK_GALLERY = (id) =>
   `https://api.dicebear.com/7.x/shapes/svg?seed=anime${id}&backgroundColor=1a1a2e,16213e,0f3460&size=600`;
