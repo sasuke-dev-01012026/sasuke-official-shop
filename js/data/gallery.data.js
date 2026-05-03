@@ -7,17 +7,19 @@ export const GALLERY = [
   // NARUTO
   { id: 2, label: 'Uzumaki Naruto', series: 'Naruto', category: 'naruto' },
   // DRAGONBALL
-  { id: 3, label: 'Goku', series: 'Dragonball', category: 'dragonball' },
+  { id: 3, label: 'Son Goku', series: 'Dragon Ball', category: 'dragonball' },
   // BLEACH
   { id: 4, label: 'Kurosaki Ichigo', series: 'Bleach', category: 'bleach' },
   // FAIRY TAIL
   { id: 5, label: 'Natsu Dragneel', series: 'Fairy Tail', category: 'fairy-tail' },
   // OTHER
-  { id: 6, label: 'Tanjiro Kamado', series: 'Demon Slayer', category: 'other' },
+  { id: 6, label: 'Kamado Tanjiro', series: 'Demon Slayer: Kimetsu no Yaiba', category: 'other' },
+  { id: 7, label: 'Itadori Yuji', series: 'Jujutsu Kaisen', category: 'other' },
+  { id: 8, label: 'Eren Yeager', series: 'Attack on Titan', category: 'other' },
 ];
 
 export const GALLERY_IMGS = [
-  [ // Luffy (3 gambar)
+  [ // Luffy - One Piece (3 gambar)
     './assets/images/gallery/one_piece/01.jpg',
     './assets/images/gallery/one_piece/02.jpg',
     './assets/images/gallery/one_piece/03.jpg',
@@ -27,18 +29,30 @@ export const GALLERY_IMGS = [
     './assets/images/gallery/naruto/02.jpg',
     './assets/images/gallery/naruto/03.jpg',
   ],
-  [ // Dragon Ball (3 gambar)
+  [ // Son Goku - Dragon Ball (3 gambar)
     './assets/images/gallery/dragonball/01.png',
     './assets/images/gallery/dragonball/02.png',
     './assets/images/gallery/dragonball/03.png',
   ],
-  [ // Bleach (3 gambar) ✅ fix: ubah jpg → png
+  [ // Kurosaki Ichigo - Bleach (3 gambar)
     './assets/images/gallery/bleach/01.png',
     './assets/images/gallery/bleach/02.png',
     './assets/images/gallery/bleach/03.png',
   ],
-  './assets/images/gallery/fairy_tail/01.png', // Natsu
-  './assets/images/gallery/other/01.png',      // Tanjiro
+  [ // Natsu Dragneel - Fairy Tail (3 gambar)
+    './assets/images/gallery/fairy_tail/01.png',
+    './assets/images/gallery/fairy_tail/02.png',
+    './assets/images/gallery/fairy_tail/03.png',
+  ],
+  [ // Kamado Tanjiro - Demon Slayer (1 gambar)
+    './assets/images/gallery/demon_slayer/01.png',
+  ],
+  [ // Itadori Yuji - Jujutsu Kaisen (1 gambar)
+    './assets/images/gallery/jujutsu_kaisen/01.png',
+  ],
+  [ // Eren Yeager - Attack on Titan (1 gambar)
+    './assets/images/gallery/attack_on_titan/01.png',
+  ],
 ];
 
 export const FALLBACK_GALLERY = (id) =>
