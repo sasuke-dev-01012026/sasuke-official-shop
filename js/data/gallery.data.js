@@ -9,17 +9,41 @@ export const GALLERY = [
     series: 'One Piece',
     category: 'one-piece',
     imgs: [
-  './assets/images/gallery/one_piece/01.jpg',
-  './assets/images/gallery/one_piece/02.jpg',
-  './assets/images/gallery/one_piece/03.jpg',
-  './assets/images/gallery/one_piece/04.png',
-  './assets/images/gallery/one_piece/05.png',
-  './assets/images/gallery/one_piece/06.png',
-],
+      './assets/images/gallery/one_piece/01.jpg',
+      './assets/images/gallery/one_piece/02.jpg',
+      './assets/images/gallery/one_piece/03.jpg',
+    ],
+  },
+  {
+    id: 2,
+    label: 'Roronoa Zoro',
+    series: 'One Piece',
+    category: 'one-piece',
+    imgs: [
+      './assets/images/gallery/one_piece/04.png',
+    ],
+  },
+  {
+    id: 3,
+    label: 'Nami',
+    series: 'One Piece',
+    category: 'one-piece',
+    imgs: [
+      './assets/images/gallery/one_piece/05.png',
+    ],
+  },
+  {
+    id: 4,
+    label: 'Sanji',
+    series: 'One Piece',
+    category: 'one-piece',
+    imgs: [
+      './assets/images/gallery/one_piece/06.png',
+    ],
   },
   // NARUTO
   {
-    id: 2,
+    id: 5,
     label: 'Uzumaki Naruto',
     series: 'Naruto',
     category: 'naruto',
@@ -31,7 +55,7 @@ export const GALLERY = [
   },
   // DRAGONBALL
   {
-    id: 3,
+    id: 6,
     label: 'Son Goku',
     series: 'Dragon Ball',
     category: 'dragonball',
@@ -43,7 +67,7 @@ export const GALLERY = [
   },
   // BLEACH
   {
-    id: 4,
+    id: 7,
     label: 'Kurosaki Ichigo',
     series: 'Bleach',
     category: 'bleach',
@@ -55,7 +79,7 @@ export const GALLERY = [
   },
   // FAIRY TAIL
   {
-    id: 5,
+    id: 8,
     label: 'Natsu Dragneel',
     series: 'Fairy Tail',
     category: 'fairy-tail',
@@ -67,7 +91,7 @@ export const GALLERY = [
   },
   // OTHER
   {
-    id: 6,
+    id: 9,
     label: 'Kamado Tanjiro',
     series: 'Demon Slayer: Kimetsu no Yaiba',
     category: 'other',
@@ -76,7 +100,7 @@ export const GALLERY = [
     ],
   },
   {
-    id: 7,
+    id: 10,
     label: 'Itadori Yuji',
     series: 'Jujutsu Kaisen',
     category: 'other',
@@ -85,7 +109,7 @@ export const GALLERY = [
     ],
   },
   {
-    id: 8,
+    id: 11,
     label: 'Eren Yeager',
     series: 'Attack on Titan',
     category: 'other',
