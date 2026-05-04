@@ -6,6 +6,7 @@ const PER_PAGE = 12;
 export class GalleryPage {
   #lightbox;
   #currentFilter = 'all';
+  #currentCharFilter = 'all'; // 'all' = semua karakter di anime tsb
   #currentPage = 1;
 
   constructor(lightbox) {
@@ -31,6 +32,12 @@ export class GalleryPage {
             <button class="filter-btn" data-filter="fairy-tail">Fairy Tail</button>
             <button class="filter-btn" data-filter="other">Other</button>
           </div>
+
+          <!-- Sub-filter karakter: muncul saat anime tertentu dipilih -->
+          <div class="char-bar-wrap" id="char-bar-wrap">
+            <div class="char-bar" id="char-bar"></div>
+          </div>
+
           <div class="gallery-grid" id="gallery-grid"></div>
           <div class="pagination" id="pagination"></div>
         </div>
@@ -39,12 +46,26 @@ export class GalleryPage {
 
   /** Bind filter bar — call after render() HTML is in the DOM */
   bindEvents() {
+    // Anime filter
     document.getElementById('filter-bar').addEventListener('click', (e) => {
       const btn = e.target.closest('.filter-btn');
       if (!btn) return;
       this.#currentFilter = btn.dataset.filter;
+      this.#currentCharFilter = 'all'; // reset karakter saat ganti anime
       this.#currentPage = 1;
       document.querySelectorAll('#filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      this.#renderCharBar();
+      this.renderGrid();
+    });
+
+    // Char filter (delegasi event)
+    document.getElementById('char-bar').addEventListener('click', (e) => {
+      const btn = e.target.closest('.char-btn');
+      if (!btn) return;
+      this.#currentCharFilter = btn.dataset.char;
+      this.#currentPage = 1;
+      document.querySelectorAll('#char-bar .char-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       this.renderGrid();
     });
@@ -108,10 +129,57 @@ export class GalleryPage {
 
   // --- Private helpers ---
 
+  /** Render sub-filter tombol karakter berdasarkan anime aktif */
+  #renderCharBar() {
+    const wrap   = document.getElementById('char-bar-wrap');
+    const bar    = document.getElementById('char-bar');
+    bar.innerHTML = '';
+
+    // Kalau "All" dipilih → sembunyikan char bar
+    if (this.#currentFilter === 'all') {
+      wrap.classList.remove('visible');
+      return;
+    }
+
+    // Ambil karakter unik dari anime yang dipilih
+    const chars = GALLERY
+      .filter(i => i.category === this.#currentFilter)
+      .map(i => ({ id: i.id, label: i.label }));
+
+    // Kalau cuma 1 karakter → tidak perlu tampilkan sub-filter
+    if (chars.length <= 1) {
+      wrap.classList.remove('visible');
+      return;
+    }
+
+    // Tombol "All [Anime]"
+    const allBtn = document.createElement('button');
+    allBtn.className = 'char-btn active';
+    allBtn.dataset.char = 'all';
+    allBtn.textContent = 'All';
+    bar.appendChild(allBtn);
+
+    // Tombol per karakter
+    chars.forEach(({ id, label }) => {
+      const btn = document.createElement('button');
+      btn.className = 'char-btn';
+      btn.dataset.char = String(id);
+      btn.textContent = label;
+      bar.appendChild(btn);
+    });
+
+    wrap.classList.add('visible');
+  }
+
   #filtered() {
-    return this.#currentFilter === 'all'
+    // Filter anime
+    const byAnime = this.#currentFilter === 'all'
       ? GALLERY
       : GALLERY.filter(i => i.category === this.#currentFilter);
+
+    // Filter karakter (sub-filter)
+    if (this.#currentCharFilter === 'all') return byAnime;
+    return byAnime.filter(i => String(i.id) === this.#currentCharFilter);
   }
 
   #renderPagination(total) {
