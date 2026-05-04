@@ -1335,3 +1335,61 @@ footer {
     padding: 16px 14px;
   }
 }
+
+/* ===========================
+   CHARACTER SUB-FILTER BAR
+=========================== */
+.char-bar-wrap {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.3s ease,
+              margin-bottom 0.35s ease;
+  margin-bottom: 0;
+}
+
+.char-bar-wrap.visible {
+  max-height: 120px;
+  opacity: 1;
+  margin-bottom: 32px;
+}
+
+.char-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scroll-behavior: smooth;
+}
+
+.char-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.char-btn {
+  font-family: 'ABeeZee', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 5px 16px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  border-radius: 99px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.22s ease;
+}
+
+.char-btn:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.char-btn.active {
+  border-color: rgba(183, 28, 28, 0.55);
+  color: var(--text);
+  background: rgba(183, 28, 28, 0.08);
+}
