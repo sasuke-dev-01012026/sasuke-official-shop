@@ -60,10 +60,10 @@ export class GalleryPage {
   renderGrid() {
     const items = this.#filtered();
 
-    // Expand: karakter dengan banyak gambar jadi beberapa item
-    const expanded = items.flatMap((item) =>
-      getImgs(item.id).map((src, imgIdx) => ({ ...item, src, imgIdx }))
-    );
+    // Expand + shuffle setiap render
+    const expanded = items
+      .flatMap((item) => getImgs(item.id).map((src, imgIdx) => ({ ...item, src, imgIdx })))
+      .sort(() => Math.random() - 0.5);
 
     const total     = Math.ceil(expanded.length / PER_PAGE);
     const start     = (this.#currentPage - 1) * PER_PAGE;
