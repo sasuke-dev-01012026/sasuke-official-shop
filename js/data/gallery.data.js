@@ -9,10 +9,13 @@ export const GALLERY = [
     series: 'One Piece',
     category: 'one-piece',
     imgs: [
-      './assets/images/gallery/one_piece/01.jpg',
-      './assets/images/gallery/one_piece/02.jpg',
-      './assets/images/gallery/one_piece/03.jpg',
-    ],
+  './assets/images/gallery/one_piece/01.jpg',
+  './assets/images/gallery/one_piece/02.jpg',
+  './assets/images/gallery/one_piece/03.jpg',
+  './assets/images/gallery/one_piece/04.png',
+  './assets/images/gallery/one_piece/05.png',
+  './assets/images/gallery/one_piece/06.png',
+],
   },
   // NARUTO
   {
