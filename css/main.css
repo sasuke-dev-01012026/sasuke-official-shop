@@ -324,51 +324,36 @@ main {
   margin: 0 auto;
 }
 
-/* ===========================
-   FILTER BAR — TWO-LEVEL SLIDING
-=========================== */
-.filters-wrap {
+/* ─── Filter bar utama (single bar, multi-level) ─── */
+.filters {
   display: flex;
-  justify-content: center;
-  margin-bottom: 44px;
-}
-
-/* Clip area — hanya tampilkan 1 panel sekaligus */
-.filter-bar-clip {
-  overflow: hidden;
-  width: 100%;
-}
-
-/* Track yang mengandung 2 panel berdampingan */
-.filter-bar-track {
-  display: flex;
-  width: 200%;
-  transform: translateX(0);
-  transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Geser ke panel karakter */
-.filter-bar-track.at-char {
-  transform: translateX(-50%);
-}
-
-/* Setiap panel mengisi separuh track = lebar penuh clip */
-.filter-panel {
-  width: 50%;
-  flex-shrink: 0;
-  display: flex;
-  gap: 8px;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
   flex-wrap: nowrap;
   overflow-x: auto;
+  margin-bottom: 44px;
   padding-bottom: 6px;
   scroll-behavior: smooth;
+  max-width: 100%;
+  -webkit-overflow-scrolling: touch;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  /* Smooth fade saat level filter berganti */
+  opacity: 1;
+  transition: opacity 0.15s ease;
 }
 
-.filter-panel::-webkit-scrollbar {
+.filters::-webkit-scrollbar {
   display: none;
 }
 
-/* ── Tombol anime filter ── */
+/* State transitioning — dipasang via JS sebelum innerHTML di-reset */
+.filters.filter-transitioning {
+  opacity: 0;
+}
+
 .filter-btn {
   font-family: 'ABeeZee', sans-serif;
   font-size: 10px;
@@ -393,67 +378,6 @@ main {
   border-color: var(--accent-r);
   color: var(--text);
   background: var(--accent-r-dim);
-}
-
-/* ── Tombol karakter ── */
-.char-btn {
-  font-family: 'ABeeZee', sans-serif;
-  font-size: 11px;
-  letter-spacing: 0.06em;
-  text-transform: capitalize;
-  padding: 6px 18px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-muted);
-  border-radius: 99px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.22s ease;
-}
-
-.char-btn:hover {
-  border-color: var(--border-hover);
-  color: var(--text);
-}
-
-.char-btn.active {
-  border-color: rgba(183, 28, 28, 0.55);
-  color: var(--text);
-  background: rgba(183, 28, 28, 0.08);
-}
-
-/* ── Tombol Kembali ── */
-.filter-back-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-family: 'ABeeZee', sans-serif;
-  font-size: 10px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  padding: 6px 16px 6px 12px;
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-muted);
-  border-radius: 99px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: all 0.22s ease;
-}
-
-.filter-back-btn svg {
-  flex-shrink: 0;
-  transition: transform 0.22s ease;
-}
-
-.filter-back-btn:hover {
-  border-color: var(--accent-r);
-  color: var(--text);
-  background: var(--accent-r-dim);
-}
-
-.filter-back-btn:hover svg {
-  transform: translateX(-2px);
 }
 
 .gallery-grid {
@@ -1343,6 +1267,16 @@ footer {
     padding: 0 12px 80px;
   }
 
+  /* Filter tetap satu baris, scroll ke samping di layar kecil */
+  .filters {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-left: 2px;
+    padding-right: 16px;
+    margin-bottom: 32px;
+  }
+
   .gallery-grid {
     gap: 6px;
   }
@@ -1414,4 +1348,45 @@ footer {
   }
 }
 
-/* (char-bar lama dihapus — filter karakter terintegrasi di .filter-bar-track) */
+/* ===========================
+   FILTER BERTINGKAT — TOMBOL KEMBALI
+=========================== */
+
+/* Tombol Kembali: posisi paling kiri, styling berbeda */
+.filter-btn--back {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  position: relative;
+  padding-left: 12px !important;
+  padding-right: 16px !important;
+  border-color: var(--border-hover) !important;
+  color: var(--text-muted) !important;
+  background: transparent !important;
+}
+
+.filter-btn--back svg {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.filter-btn--back:hover {
+  color: var(--text) !important;
+  border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.filter-btn--back:hover svg {
+  transform: translateX(-2px);
+}
+
+/* Separator tipis antara tombol Kembali dan tombol karakter */
+.filter-btn--back::after {
+  content: '';
+  position: absolute;
+  right: -7px;
+  top: 18%;
+  height: 64%;
+  width: 1px;
+  background: var(--border-hover);
+  pointer-events: none;
+}
