@@ -3,31 +3,31 @@ import { GALLERY, FALLBACK_GALLERY, getCoverImg, getImgs } from '../data/gallery
 
 const PER_PAGE = 12;
 
-// Daftar anime filter (urutan tetap)
+// Daftar anime unik beserta metadata untuk filter level 1
 const ANIME_FILTERS = [
-  { value: 'all',        label: 'All'        },
-  { value: 'one-piece',  label: 'One Piece'  },
-  { value: 'naruto',     label: 'Naruto'     },
-  { value: 'dragonball', label: 'Dragonball' },
-  { value: 'bleach',     label: 'Bleach'     },
-  { value: 'fairy-tail', label: 'Fairy Tail' },
-  { value: 'other',      label: 'Other'      },
+  { key: 'all',        label: 'All'        },
+  { key: 'one-piece',  label: 'One Piece'  },
+  { key: 'naruto',     label: 'Naruto'     },
+  { key: 'dragonball', label: 'Dragonball' },
+  { key: 'bleach',     label: 'Bleach'     },
+  { key: 'fairy-tail', label: 'Fairy Tail' },
+  { key: 'other',      label: 'Other'      },
 ];
 
 export class GalleryPage {
   #lightbox;
 
-  // 'anime'  → sedang tampil filter anime
-  // 'char'   → sedang tampil filter karakter
-  #level          = 'anime';
-  #currentAnime   = 'all';
-  #currentChar    = 'all';
+  // ─── State ──────────────────────────────────────────────────
+  #filterLevel    = 'anime';   // 'anime' | 'char'
+  #selectedAnime  = 'all';     // key anime yang sedang aktif
+  #selectedChar   = 'all';     // id karakter ('all' = semua)
   #currentPage    = 1;
 
   constructor(lightbox) {
     this.#lightbox = lightbox;
   }
 
+  // ─── Public: render HTML shell ───────────────────────────────
   render() {
     return `
       <section class="page active" id="page-gallery">
@@ -37,25 +37,8 @@ export class GalleryPage {
           <p class="hero-sub">One Piece &amp; Anime Universe</p>
         </div>
         <div class="gallery-wrap">
-
-          <div class="filters-wrap">
-            <div class="filter-bar-clip">
-              <div class="filter-bar-track" id="filter-bar-track">
-
-                <!-- Panel 0: Anime level -->
-                <div class="filter-panel" id="panel-anime">
-                  ${ANIME_FILTERS.map(f => `
-                    <button class="filter-btn${f.value === 'all' ? ' active' : ''}"
-                            data-filter="${f.value}">${f.label}</button>
-                  `).join('')}
-                </div>
-
-                <!-- Panel 1: Character level (diisi dinamis) -->
-                <div class="filter-panel" id="panel-char"></div>
-
-              </div>
-            </div>
-          </div>
+          <!-- Single filter bar — isinya berubah sesuai level -->
+          <div class="filters" id="filter-bar"></div>
 
           <div class="gallery-grid" id="gallery-grid"></div>
           <div class="pagination"   id="pagination"></div>
@@ -63,78 +46,54 @@ export class GalleryPage {
       </section>`;
   }
 
+  // ─── Public: bind events setelah render() masuk DOM ─────────
   bindEvents() {
-    // Klik anime filter
-    document.getElementById('panel-anime').addEventListener('click', (e) => {
-      const btn = e.target.closest('.filter-btn');
+    document.getElementById('filter-bar').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-action]');
       if (!btn) return;
 
-      const anime = btn.dataset.filter;
+      const action = btn.dataset.action;
 
-      document.querySelectorAll('#panel-anime .filter-btn')
-        .forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+      if (action === 'back') {
+        // Kembali ke level anime
+        this.#goAnimeLevel();
 
-      if (anime === 'all') {
-        this.#level        = 'anime';
-        this.#currentAnime = 'all';
-        this.#currentChar  = 'all';
+      } else if (action === 'anime') {
+        const key = btn.dataset.key;
+
+        if (key === 'all') {
+          // "All" → tetap di level anime, tampilkan semua
+          this.#selectedAnime = 'all';
+          this.#selectedChar  = 'all';
+          this.#currentPage   = 1;
+          this.#renderFilterBar();
+          this.renderGrid();
+        } else {
+          // Klik salah satu anime → masuk level karakter
+          this.#goCharLevel(key);
+        }
+
+      } else if (action === 'char') {
+        // Filter karakter
+        const charId = btn.dataset.char;
+        this.#selectedChar = charId;
         this.#currentPage  = 1;
+        this.#renderFilterBar();
         this.renderGrid();
-        return;
       }
-
-      const chars = this.#charsOf(anime);
-      if (chars.length <= 1) {
-        // Hanya 1 karakter — langsung filter tanpa masuk level char
-        this.#level        = 'anime';
-        this.#currentAnime = anime;
-        this.#currentChar  = 'all';
-        this.#currentPage  = 1;
-        this.renderGrid();
-        return;
-      }
-
-      // Masuk ke level karakter
-      this.#currentAnime = anime;
-      this.#currentChar  = 'all';
-      this.#currentPage  = 1;
-      this.#buildCharPanel(anime);
-      this.#slideToChar();
-      this.renderGrid();
     });
 
-    // Klik char filter (delegasi)
-    document.getElementById('panel-char').addEventListener('click', (e) => {
-      // Tombol kembali
-      if (e.target.closest('.filter-back-btn')) {
-        this.#slideToAnime();
-        this.#currentAnime = 'all';
-        this.#currentChar  = 'all';
-        this.#currentPage  = 1;
-        document.querySelectorAll('#panel-anime .filter-btn')
-          .forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
-        this.renderGrid();
-        return;
-      }
-
-      const btn = e.target.closest('.char-btn');
-      if (!btn) return;
-
-      this.#currentChar = btn.dataset.char;
-      this.#currentPage = 1;
-      document.querySelectorAll('#panel-char .char-btn')
-        .forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      this.renderGrid();
-    });
+    // Render awal
+    this.#renderFilterBar();
   }
 
+  // ─── Public: skeleton loading ────────────────────────────────
   showSkeleton(count = 6) {
     document.getElementById('gallery-grid').innerHTML =
       Array(count).fill('<div class="skeleton-item"></div>').join('');
   }
 
+  // ─── Public: render grid + pagination ───────────────────────
   renderGrid() {
     const items = this.#filtered();
 
@@ -183,53 +142,105 @@ export class GalleryPage {
     this.#renderPagination(total);
   }
 
-  // ─── Private helpers ───────────────────────────────────────────
-
-  #charsOf(anime) {
-    return GALLERY.filter(i => i.category === anime);
+  // ─── Private: ganti state ke level karakter ─────────────────
+  #goCharLevel(animeKey) {
+    this.#filterLevel   = 'char';
+    this.#selectedAnime = animeKey;
+    this.#selectedChar  = 'all';
+    this.#currentPage   = 1;
+    this.#renderFilterBar();
+    this.renderGrid();
   }
 
-  #buildCharPanel(anime) {
-    const panel = document.getElementById('panel-char');
-    const chars = this.#charsOf(anime);
-    const animeName = ANIME_FILTERS.find(f => f.value === anime)?.label ?? anime;
-
-    panel.innerHTML = `
-      <button class="filter-back-btn" aria-label="Kembali ke daftar anime">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="15 18 9 12 15 6"/>
-        </svg>
-        <span>${animeName}</span>
-      </button>
-      <button class="char-btn active" data-char="all">All</button>
-      ${chars.map(c => `
-        <button class="char-btn" data-char="${c.id}">${c.label}</button>
-      `).join('')}
-    `;
-
-    panel.scrollLeft = 0;
+  // ─── Private: kembali ke level anime ────────────────────────
+  #goAnimeLevel() {
+    this.#filterLevel   = 'anime';
+    this.#selectedAnime = 'all';
+    this.#selectedChar  = 'all';
+    this.#currentPage   = 1;
+    this.#renderFilterBar();
+    this.renderGrid();
   }
 
-  #slideToChar() {
-    this.#level = 'char';
-    document.getElementById('filter-bar-track').classList.add('at-char');
+  // ─── Private: render tombol filter sesuai level aktif ───────
+  #renderFilterBar() {
+    const bar = document.getElementById('filter-bar');
+
+    // Tambahkan class transisi sebelum update
+    bar.classList.add('filter-transitioning');
+
+    // Delay singkat biar fade-out keliatan, lalu update konten
+    setTimeout(() => {
+      bar.innerHTML = '';
+
+      if (this.#filterLevel === 'anime') {
+        this.#buildAnimeButtons(bar);
+      } else {
+        this.#buildCharButtons(bar);
+      }
+
+      // Fade-in
+      bar.classList.remove('filter-transitioning');
+    }, 150);
   }
 
-  #slideToAnime() {
-    this.#level = 'anime';
-    document.getElementById('filter-bar-track').classList.remove('at-char');
+  // ─── Private: tombol-tombol level anime ─────────────────────
+  #buildAnimeButtons(bar) {
+    ANIME_FILTERS.forEach(({ key, label }) => {
+      const btn = document.createElement('button');
+      btn.className = 'filter-btn' + (key === this.#selectedAnime ? ' active' : '');
+      btn.dataset.action = 'anime';
+      btn.dataset.key    = key;
+      btn.textContent    = label;
+      bar.appendChild(btn);
+    });
   }
 
+  // ─── Private: tombol-tombol level karakter ──────────────────
+  #buildCharButtons(bar) {
+    // Tombol Kembali — paling kiri
+    const backBtn = document.createElement('button');
+    backBtn.className    = 'filter-btn filter-btn--back';
+    backBtn.dataset.action = 'back';
+    backBtn.innerHTML    = `
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Kembali`;
+    bar.appendChild(backBtn);
+
+    // Tombol "All" karakter
+    const allBtn = document.createElement('button');
+    allBtn.className    = 'filter-btn' + (this.#selectedChar === 'all' ? ' active' : '');
+    allBtn.dataset.action = 'char';
+    allBtn.dataset.char   = 'all';
+    allBtn.textContent    = 'All';
+    bar.appendChild(allBtn);
+
+    // Karakter dari anime yang dipilih
+    const chars = GALLERY.filter(i => i.category === this.#selectedAnime);
+    chars.forEach(({ id, label }) => {
+      const btn = document.createElement('button');
+      btn.className    = 'filter-btn' + (String(id) === this.#selectedChar ? ' active' : '');
+      btn.dataset.action = 'char';
+      btn.dataset.char   = String(id);
+      btn.textContent    = label;
+      bar.appendChild(btn);
+    });
+  }
+
+  // ─── Private: filter data ────────────────────────────────────
   #filtered() {
-    const byAnime = this.#currentAnime === 'all'
+    const byAnime = this.#selectedAnime === 'all'
       ? GALLERY
-      : GALLERY.filter(i => i.category === this.#currentAnime);
+      : GALLERY.filter(i => i.category === this.#selectedAnime);
 
-    if (this.#currentChar === 'all') return byAnime;
-    return byAnime.filter(i => String(i.id) === String(this.#currentChar));
+    if (this.#selectedChar === 'all') return byAnime;
+    return byAnime.filter(i => String(i.id) === this.#selectedChar);
   }
 
+  // ─── Private: pagination ─────────────────────────────────────
   #renderPagination(total) {
     const container = document.getElementById('pagination');
     container.innerHTML = '';
@@ -238,13 +249,13 @@ export class GalleryPage {
     const prev = document.createElement('button');
     prev.className = 'pg-arrow';
     prev.innerHTML = '&#8592;';
-    prev.disabled = this.#currentPage === 1;
+    prev.disabled  = this.#currentPage === 1;
     prev.addEventListener('click', () => this.#goPage(this.#currentPage - 1));
     container.appendChild(prev);
 
     for (let i = 1; i <= total; i++) {
       const btn = document.createElement('button');
-      btn.className = `pg-btn${i === this.#currentPage ? ' active' : ''}`;
+      btn.className  = `pg-btn${i === this.#currentPage ? ' active' : ''}`;
       btn.textContent = i;
       btn.addEventListener('click', () => this.#goPage(i));
       container.appendChild(btn);
@@ -253,7 +264,7 @@ export class GalleryPage {
     const next = document.createElement('button');
     next.className = 'pg-arrow';
     next.innerHTML = '&#8594;';
-    next.disabled = this.#currentPage === total;
+    next.disabled  = this.#currentPage === total;
     next.addEventListener('click', () => this.#goPage(this.#currentPage + 1));
     container.appendChild(next);
   }
