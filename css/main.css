@@ -327,6 +327,11 @@ main {
 /* ─── Filter Shell: wadah track ─── */
 .filter-shell {
   margin-bottom: 44px;
+  /* Tinggi tetap — supaya layout di bawahnya tidak bergeser
+     saat konten track berganti (anime ↔ karakter).
+     Nilai 36px = tinggi satu baris tombol filter. */
+  height: 36px;
+  overflow: hidden;
 }
 
 /* ─── Filter Track: baris tombol-tombol ─── */
@@ -341,6 +346,7 @@ main {
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  height: 100%;
 
   /* Fade transition saat ganti level */
   opacity: 1;
