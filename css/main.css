@@ -324,47 +324,85 @@ main {
   margin: 0 auto;
 }
 
-/* ─── Filter bar utama (single bar, multi-level) ─── */
-.filters {
+/* ─── Filter Shell: wadah breadcrumb + track ─── */
+.filter-shell {
+  margin-bottom: 44px;
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
+  flex-direction: column;
   gap: 10px;
+}
+
+/* ─── Breadcrumb (muncul saat level karakter) ─── */
+.filter-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  animation: crumbIn 0.25s ease forwards;
+}
+
+@keyframes crumbIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.crumb-seg {
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.crumb-seg.crumb-active {
+  color: var(--text);
+}
+
+.filter-breadcrumb svg {
+  color: var(--text-muted);
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+
+/* ─── Filter Track: baris tombol-tombol ─── */
+.filter-track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   flex-wrap: nowrap;
   overflow-x: auto;
-  margin-bottom: 44px;
-  padding-bottom: 6px;
+  padding-bottom: 4px;
   scroll-behavior: smooth;
-  max-width: 100%;
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: none;
   scrollbar-width: none;
 
-  /* Smooth fade saat level filter berganti */
+  /* Fade transition saat ganti level */
   opacity: 1;
-  transition: opacity 0.15s ease;
+  transform: translateX(0);
+  transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.filters::-webkit-scrollbar {
+.filter-track::-webkit-scrollbar {
   display: none;
 }
 
-/* State transitioning — dipasang via JS sebelum innerHTML di-reset */
-.filters.filter-transitioning {
+/* State: sedang fade-out (dipasang JS sebelum re-render) */
+.filter-track.track--out {
   opacity: 0;
+  transform: translateX(6px);
 }
 
+/* ─── Tombol filter umum ─── */
 .filter-btn {
   font-family: 'ABeeZee', sans-serif;
   font-size: 10px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  padding: 7px 22px;
+  padding: 7px 20px;
   border: 1px solid var(--border);
   background: transparent;
   color: var(--text-muted);
   border-radius: 99px;
-  transition: all 0.25s ease;
+  transition: border-color 0.22s ease, color 0.22s ease, background 0.22s ease;
   white-space: nowrap;
   flex-shrink: 0;
 }
@@ -378,6 +416,47 @@ main {
   border-color: var(--accent-r);
   color: var(--text);
   background: var(--accent-r-dim);
+}
+
+/* ─── Tombol Back — icon only, bulat ─── */
+.filter-btn--back {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border-color: var(--border-hover);
+  color: var(--text-muted);
+  background: transparent;
+}
+
+.filter-btn--back:hover {
+  background: var(--bg-3);
+  border-color: rgba(255,255,255,0.28);
+  color: var(--text);
+}
+
+.filter-btn--back svg {
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.filter-btn--back:hover svg {
+  transform: translateX(-2px);
+}
+
+/* ─── Divider tipis antara back button dan char buttons ─── */
+.filter-divider {
+  display: inline-block;
+  width: 1px;
+  height: 18px;
+  background: var(--border-hover);
+  flex-shrink: 0;
+  border-radius: 1px;
+  opacity: 0.6;
 }
 
 .gallery-grid {
@@ -1267,16 +1346,6 @@ footer {
     padding: 0 12px 80px;
   }
 
-  /* Filter tetap satu baris, scroll ke samping di layar kecil */
-  .filters {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding-left: 2px;
-    padding-right: 16px;
-    margin-bottom: 32px;
-  }
-
   .gallery-grid {
     gap: 6px;
   }
@@ -1349,44 +1418,7 @@ footer {
 }
 
 /* ===========================
-   FILTER BERTINGKAT — TOMBOL KEMBALI
+   RESPONSIVE — MOBILE (filter)
 =========================== */
-
-/* Tombol Kembali: posisi paling kiri, styling berbeda */
-.filter-btn--back {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  position: relative;
-  padding-left: 12px !important;
-  padding-right: 16px !important;
-  border-color: var(--border-hover) !important;
-  color: var(--text-muted) !important;
-  background: transparent !important;
-}
-
-.filter-btn--back svg {
-  flex-shrink: 0;
-  transition: transform 0.2s ease;
-}
-
-.filter-btn--back:hover {
-  color: var(--text) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
-}
-
-.filter-btn--back:hover svg {
-  transform: translateX(-2px);
-}
-
-/* Separator tipis antara tombol Kembali dan tombol karakter */
-.filter-btn--back::after {
-  content: '';
-  position: absolute;
-  right: -7px;
-  top: 18%;
-  height: 64%;
-  width: 1px;
-  background: var(--border-hover);
-  pointer-events: none;
-}
+/* Filter track tetap single-line scroll di layar kecil — sudah ditangani
+   flex-wrap: nowrap + overflow-x: auto di .filter-track di atas */
