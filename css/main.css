@@ -391,6 +391,13 @@ main {
   background: var(--accent-r-dim);
 }
 
+/* ─── Tombol karakter — sedikit lebih kecil dari tombol anime ─── */
+.filter-btn--sm {
+  font-size: 9px;
+  padding: 5px 14px;
+  letter-spacing: 0.16em;
+}
+
 /* ─── Tombol Back — icon only, bulat ─── */
 .filter-btn--back {
   width: 34px;
