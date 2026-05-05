@@ -324,42 +324,9 @@ main {
   margin: 0 auto;
 }
 
-/* ─── Filter Shell: wadah breadcrumb + track ─── */
+/* ─── Filter Shell: wadah track ─── */
 .filter-shell {
   margin-bottom: 44px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* ─── Breadcrumb (muncul saat level karakter) ─── */
-.filter-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  animation: crumbIn 0.25s ease forwards;
-}
-
-@keyframes crumbIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.crumb-seg {
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.crumb-seg.crumb-active {
-  color: var(--text);
-}
-
-.filter-breadcrumb svg {
-  color: var(--text-muted);
-  opacity: 0.5;
-  flex-shrink: 0;
 }
 
 /* ─── Filter Track: baris tombol-tombol ─── */
