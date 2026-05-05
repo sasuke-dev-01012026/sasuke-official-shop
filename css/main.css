@@ -327,7 +327,6 @@ main {
 /* ─── Filter Shell: wadah track ─── */
 .filter-shell {
   margin-bottom: 44px;
-  min-height: 40px;
   overflow: visible;
 }
 
@@ -339,14 +338,10 @@ main {
   flex-wrap: nowrap;
   overflow-x: auto;
   overflow-y: visible;
-  padding-bottom: 4px;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  height: 40px;
-
-  /* Fade transition saat ganti level */
   opacity: 1;
   transform: translateX(0);
   transition: opacity 0.15s ease, transform 0.15s ease;
@@ -356,7 +351,7 @@ main {
   display: none;
 }
 
-/* State: sedang fade-out (dipasang JS sebelum re-render) */
+/* State fade-out saat ganti level */
 .filter-track.track--out {
   opacity: 0;
   transform: translateX(6px);
@@ -389,7 +384,7 @@ main {
   background: var(--accent-r-dim);
 }
 
-/* ─── Tombol karakter — sedikit lebih kecil dari tombol anime ─── */
+/* ─── Tombol karakter — lebih kecil dari tombol anime ─── */
 .filter-btn--sm {
   font-size: 9px;
   padding: 5px 14px;
@@ -406,9 +401,10 @@ main {
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  border-color: var(--border-hover);
+  border: 1px solid var(--border-hover);
   color: var(--text-muted);
   background: transparent;
+  transition: border-color 0.22s ease, color 0.22s ease, background 0.22s ease;
 }
 
 .filter-btn--back:hover {
@@ -426,7 +422,7 @@ main {
   transform: translateX(-2px);
 }
 
-/* ─── Divider tipis antara back button dan char buttons ─── */
+/* ─── Divider antara back dan char buttons ─── */
 .filter-divider {
   display: inline-block;
   width: 1px;
@@ -1395,8 +1391,4 @@ footer {
   }
 }
 
-/* ===========================
-   RESPONSIVE — MOBILE (filter)
-=========================== */
-/* Filter track tetap single-line scroll di layar kecil — sudah ditangani
-   flex-wrap: nowrap + overflow-x: auto di .filter-track di atas */
+
