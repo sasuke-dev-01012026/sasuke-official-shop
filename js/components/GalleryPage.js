@@ -3,7 +3,7 @@ import { GALLERY, FALLBACK_GALLERY, getCoverImg, getImgs } from '../data/gallery
 
 const PER_PAGE = 12;
 
-// Daftar anime unik beserta metadata untuk filter level 1
+// ─── Metadata filter level-1 (anime) ────────────────────────────
 const ANIME_FILTERS = [
   { key: 'all',        label: 'All'        },
   { key: 'one-piece',  label: 'One Piece'  },
@@ -14,20 +14,27 @@ const ANIME_FILTERS = [
   { key: 'other',      label: 'Other'      },
 ];
 
+// SVG icon "back" (arrow left)
+const ICON_BACK = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
+  viewBox="0 0 24 24" fill="none" stroke="currentColor"
+  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <polyline points="15 18 9 12 15 6"/>
+</svg>`;
+
 export class GalleryPage {
   #lightbox;
 
-  // ─── State ──────────────────────────────────────────────────
-  #filterLevel    = 'anime';   // 'anime' | 'char'
-  #selectedAnime  = 'all';     // key anime yang sedang aktif
-  #selectedChar   = 'all';     // id karakter ('all' = semua)
-  #currentPage    = 1;
+  // ── State ──────────────────────────────────────────────────────
+  #filterLevel   = 'anime';  // 'anime' | 'char'
+  #selectedAnime = 'all';    // key anime aktif
+  #selectedChar  = 'all';    // id karakter ('all' = semua)
+  #currentPage   = 1;
 
   constructor(lightbox) {
     this.#lightbox = lightbox;
   }
 
-  // ─── Public: render HTML shell ───────────────────────────────
+  // ── Public: render HTML shell ──────────────────────────────────
   render() {
     return `
       <section class="page active" id="page-gallery">
@@ -37,68 +44,62 @@ export class GalleryPage {
           <p class="hero-sub">One Piece &amp; Anime Universe</p>
         </div>
         <div class="gallery-wrap">
-          <!-- Single filter bar — isinya berubah sesuai level -->
-          <div class="filters" id="filter-bar"></div>
-
+          <div class="filter-shell" id="filter-shell">
+            <div class="filter-track" id="filter-track"></div>
+          </div>
           <div class="gallery-grid" id="gallery-grid"></div>
           <div class="pagination"   id="pagination"></div>
         </div>
       </section>`;
   }
 
-  // ─── Public: bind events setelah render() masuk DOM ─────────
+  // ── Public: bind events setelah render() masuk DOM ────────────
   bindEvents() {
-    document.getElementById('filter-bar').addEventListener('click', (e) => {
+    document.getElementById('filter-track').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-action]');
       if (!btn) return;
 
       const action = btn.dataset.action;
 
       if (action === 'back') {
-        // Kembali ke level anime
-        this.#goAnimeLevel();
+        this.#toAnimeLevel();
 
       } else if (action === 'anime') {
         const key = btn.dataset.key;
-
         if (key === 'all') {
-          // "All" → tetap di level anime, tampilkan semua
           this.#selectedAnime = 'all';
           this.#selectedChar  = 'all';
           this.#currentPage   = 1;
-          this.#renderFilterBar();
+          this.#renderTrack();
           this.renderGrid();
         } else {
-          // Klik salah satu anime → masuk level karakter
-          this.#goCharLevel(key);
+          // Masuk ke level karakter
+          this.#toCharLevel(key);
         }
 
       } else if (action === 'char') {
-        // Filter karakter
-        const charId = btn.dataset.char;
-        this.#selectedChar = charId;
+        this.#selectedChar = btn.dataset.char;
         this.#currentPage  = 1;
-        this.#renderFilterBar();
+        this.#renderTrack();
         this.renderGrid();
       }
     });
 
     // Render awal
-    this.#renderFilterBar();
+    this.#renderTrack();
   }
 
-  // ─── Public: skeleton loading ────────────────────────────────
+  // ── Public: skeleton ───────────────────────────────────────────
   showSkeleton(count = 6) {
     document.getElementById('gallery-grid').innerHTML =
       Array(count).fill('<div class="skeleton-item"></div>').join('');
   }
 
-  // ─── Public: render grid + pagination ───────────────────────
+  // ── Public: render grid + pagination ──────────────────────────
   renderGrid() {
     const items = this.#filtered();
-
     const expanded = items
-      .flatMap((item) => getImgs(item.id).map((src, imgIdx) => ({ ...item, src, imgIdx })))
+      .flatMap((item) => getImgs(item.id).map((src) => ({ ...item, src })))
       .sort(() => Math.random() - 0.5);
 
     const total     = Math.ceil(expanded.length / PER_PAGE);
@@ -142,95 +143,127 @@ export class GalleryPage {
     this.#renderPagination(total);
   }
 
-  // ─── Private: ganti state ke level karakter ─────────────────
-  #goCharLevel(animeKey) {
+  // ── Private: masuk level karakter ─────────────────────────────
+  #toCharLevel(animeKey) {
     this.#filterLevel   = 'char';
     this.#selectedAnime = animeKey;
     this.#selectedChar  = 'all';
     this.#currentPage   = 1;
-    this.#renderFilterBar();
+    this.#renderTrack(true);
     this.renderGrid();
   }
 
-  // ─── Private: kembali ke level anime ────────────────────────
-  #goAnimeLevel() {
+  // ── Private: kembali ke level anime ───────────────────────────
+  #toAnimeLevel() {
     this.#filterLevel   = 'anime';
     this.#selectedAnime = 'all';
     this.#selectedChar  = 'all';
     this.#currentPage   = 1;
-    this.#renderFilterBar();
+    this.#renderTrack(true);
     this.renderGrid();
   }
 
-  // ─── Private: render tombol filter sesuai level aktif ───────
-  #renderFilterBar() {
-    const bar = document.getElementById('filter-bar');
+  // ── Private: render tombol di dalam track ─────────────────────
+  //   animate = true  → fade out dulu, lalu fade in
+  #renderTrack(animate = false) {
+    const track = document.getElementById('filter-track');
 
-    // Tambahkan class transisi sebelum update
-    bar.classList.add('filter-transitioning');
-
-    // Delay singkat biar fade-out keliatan, lalu update konten
-    setTimeout(() => {
-      bar.innerHTML = '';
-
+    const doRender = () => {
+      track.innerHTML = '';
       if (this.#filterLevel === 'anime') {
-        this.#buildAnimeButtons(bar);
+        this.#buildAnimeButtons(track);
       } else {
-        this.#buildCharButtons(bar);
+        this.#buildCharButtons(track);
       }
+      // Update breadcrumb label di shell
+      this.#updateBreadcrumb();
+    };
 
-      // Fade-in
-      bar.classList.remove('filter-transitioning');
-    }, 150);
+    if (animate) {
+      track.classList.add('track--fade-out');
+      setTimeout(() => {
+        doRender();
+        track.classList.remove('track--fade-out');
+      }, 140);
+    } else {
+      doRender();
+    }
   }
 
-  // ─── Private: tombol-tombol level anime ─────────────────────
-  #buildAnimeButtons(bar) {
+  // ── Private: breadcrumb label di atas filter ──────────────────
+  #updateBreadcrumb() {
+    const shell = document.getElementById('filter-shell');
+    let crumb   = shell.querySelector('.filter-breadcrumb');
+
+    if (this.#filterLevel === 'char') {
+      const animeMeta = ANIME_FILTERS.find(a => a.key === this.#selectedAnime);
+      const label     = animeMeta?.label ?? this.#selectedAnime;
+      if (!crumb) {
+        crumb = document.createElement('div');
+        crumb.className = 'filter-breadcrumb';
+        shell.insertBefore(crumb, shell.firstChild);
+      }
+      crumb.innerHTML = `
+        <span class="crumb-item">All Anime</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+        <span class="crumb-item crumb-active">${label}</span>`;
+    } else {
+      crumb?.remove();
+    }
+  }
+
+  // ── Private: tombol level anime ───────────────────────────────
+  #buildAnimeButtons(track) {
     ANIME_FILTERS.forEach(({ key, label }) => {
       const btn = document.createElement('button');
-      btn.className = 'filter-btn' + (key === this.#selectedAnime ? ' active' : '');
-      btn.dataset.action = 'anime';
-      btn.dataset.key    = key;
-      btn.textContent    = label;
-      bar.appendChild(btn);
+      const isActive = key === this.#selectedAnime;
+      btn.className       = 'filter-btn' + (isActive ? ' active' : '');
+      btn.dataset.action  = 'anime';
+      btn.dataset.key     = key;
+      btn.textContent     = label;
+      track.appendChild(btn);
     });
   }
 
-  // ─── Private: tombol-tombol level karakter ──────────────────
-  #buildCharButtons(bar) {
-    // Tombol Kembali — paling kiri
+  // ── Private: tombol level karakter ────────────────────────────
+  #buildCharButtons(track) {
+    // Tombol back — icon only, paling kiri
     const backBtn = document.createElement('button');
-    backBtn.className    = 'filter-btn filter-btn--back';
+    backBtn.className      = 'filter-btn filter-btn--back';
     backBtn.dataset.action = 'back';
-    backBtn.innerHTML    = `
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="15 18 9 12 15 6"/>
-      </svg>
-      Kembali`;
-    bar.appendChild(backBtn);
+    backBtn.setAttribute('aria-label', 'Kembali ke daftar anime');
+    backBtn.innerHTML      = ICON_BACK;
+    track.appendChild(backBtn);
 
-    // Tombol "All" karakter
+    // Divider
+    const divider = document.createElement('span');
+    divider.className = 'filter-divider';
+    track.appendChild(divider);
+
+    // Tombol "All"
     const allBtn = document.createElement('button');
-    allBtn.className    = 'filter-btn' + (this.#selectedChar === 'all' ? ' active' : '');
+    allBtn.className      = 'filter-btn' + (this.#selectedChar === 'all' ? ' active' : '');
     allBtn.dataset.action = 'char';
     allBtn.dataset.char   = 'all';
     allBtn.textContent    = 'All';
-    bar.appendChild(allBtn);
+    track.appendChild(allBtn);
 
-    // Karakter dari anime yang dipilih
+    // Tombol per karakter
     const chars = GALLERY.filter(i => i.category === this.#selectedAnime);
     chars.forEach(({ id, label }) => {
       const btn = document.createElement('button');
-      btn.className    = 'filter-btn' + (String(id) === this.#selectedChar ? ' active' : '');
+      btn.className      = 'filter-btn' + (String(id) === this.#selectedChar ? ' active' : '');
       btn.dataset.action = 'char';
       btn.dataset.char   = String(id);
       btn.textContent    = label;
-      bar.appendChild(btn);
+      track.appendChild(btn);
     });
   }
 
-  // ─── Private: filter data ────────────────────────────────────
+  // ── Private: filter data ──────────────────────────────────────
   #filtered() {
     const byAnime = this.#selectedAnime === 'all'
       ? GALLERY
@@ -240,7 +273,7 @@ export class GalleryPage {
     return byAnime.filter(i => String(i.id) === this.#selectedChar);
   }
 
-  // ─── Private: pagination ─────────────────────────────────────
+  // ── Private: pagination ───────────────────────────────────────
   #renderPagination(total) {
     const container = document.getElementById('pagination');
     container.innerHTML = '';
@@ -255,7 +288,7 @@ export class GalleryPage {
 
     for (let i = 1; i <= total; i++) {
       const btn = document.createElement('button');
-      btn.className  = `pg-btn${i === this.#currentPage ? ' active' : ''}`;
+      btn.className   = `pg-btn${i === this.#currentPage ? ' active' : ''}`;
       btn.textContent = i;
       btn.addEventListener('click', () => this.#goPage(i));
       container.appendChild(btn);
