@@ -184,7 +184,6 @@ export class GalleryPage {
   }
 
   #buildCharButtons(track) {
-    // Back — icon only, bulat
     const backBtn = document.createElement('button');
     backBtn.className      = 'filter-btn filter-btn--back';
     backBtn.dataset.action = 'back';
@@ -192,12 +191,10 @@ export class GalleryPage {
     backBtn.innerHTML      = ICON_BACK;
     track.appendChild(backBtn);
 
-    // Divider
     const divider = document.createElement('span');
     divider.className = 'filter-divider';
     track.appendChild(divider);
 
-    // All
     const allBtn = document.createElement('button');
     allBtn.className      = 'filter-btn filter-btn--sm' + (this.#selectedChar === 'all' ? ' active' : '');
     allBtn.dataset.action = 'char';
@@ -205,7 +202,6 @@ export class GalleryPage {
     allBtn.textContent    = 'All';
     track.appendChild(allBtn);
 
-    // Per karakter
     GALLERY.filter(i => i.category === this.#selectedAnime).forEach(({ id, label }) => {
       const btn = document.createElement('button');
       btn.className      = 'filter-btn filter-btn--sm' + (String(id) === this.#selectedChar ? ' active' : '');
