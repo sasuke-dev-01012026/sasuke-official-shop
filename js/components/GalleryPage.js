@@ -14,10 +14,10 @@ const ANIME_FILTERS = [
   { key: 'other',      label: 'Other'      },
 ];
 
-// SVG icon arrow-left untuk tombol back
+// SVG icon "back" (arrow left)
 const ICON_BACK = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"
   viewBox="0 0 24 24" fill="none" stroke="currentColor"
-  stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <polyline points="15 18 9 12 15 6"/>
 </svg>`;
 
@@ -73,6 +73,7 @@ export class GalleryPage {
           this.#renderTrack();
           this.renderGrid();
         } else {
+          // Masuk ke level karakter
           this.#toCharLevel(key);
         }
 
@@ -162,7 +163,8 @@ export class GalleryPage {
     this.renderGrid();
   }
 
-  // ── Private: render tombol dalam track ────────────────────────
+  // ── Private: render tombol di dalam track ─────────────────────
+  //   animate = true  → fade out dulu, lalu fade in
   #renderTrack(animate = false) {
     const track = document.getElementById('filter-track');
 
@@ -173,16 +175,43 @@ export class GalleryPage {
       } else {
         this.#buildCharButtons(track);
       }
+      // Update breadcrumb label di shell
+      this.#updateBreadcrumb();
     };
 
     if (animate) {
-      track.classList.add('track--out');
+      track.classList.add('track--fade-out');
       setTimeout(() => {
         doRender();
-        track.classList.remove('track--out');
-      }, 150);
+        track.classList.remove('track--fade-out');
+      }, 140);
     } else {
       doRender();
+    }
+  }
+
+  // ── Private: breadcrumb label di atas filter ──────────────────
+  #updateBreadcrumb() {
+    const shell = document.getElementById('filter-shell');
+    let crumb   = shell.querySelector('.filter-breadcrumb');
+
+    if (this.#filterLevel === 'char') {
+      const animeMeta = ANIME_FILTERS.find(a => a.key === this.#selectedAnime);
+      const label     = animeMeta?.label ?? this.#selectedAnime;
+      if (!crumb) {
+        crumb = document.createElement('div');
+        crumb.className = 'filter-breadcrumb';
+        shell.insertBefore(crumb, shell.firstChild);
+      }
+      crumb.innerHTML = `
+        <span class="crumb-item">All Anime</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+        <span class="crumb-item crumb-active">${label}</span>`;
+    } else {
+      crumb?.remove();
     }
   }
 
@@ -190,17 +219,18 @@ export class GalleryPage {
   #buildAnimeButtons(track) {
     ANIME_FILTERS.forEach(({ key, label }) => {
       const btn = document.createElement('button');
-      btn.className      = 'filter-btn' + (key === this.#selectedAnime ? ' active' : '');
-      btn.dataset.action = 'anime';
-      btn.dataset.key    = key;
-      btn.textContent    = label;
+      const isActive = key === this.#selectedAnime;
+      btn.className       = 'filter-btn' + (isActive ? ' active' : '');
+      btn.dataset.action  = 'anime';
+      btn.dataset.key     = key;
+      btn.textContent     = label;
       track.appendChild(btn);
     });
   }
 
   // ── Private: tombol level karakter ────────────────────────────
   #buildCharButtons(track) {
-    // Back button — icon only
+    // Tombol back — icon only, paling kiri
     const backBtn = document.createElement('button');
     backBtn.className      = 'filter-btn filter-btn--back';
     backBtn.dataset.action = 'back';
@@ -208,12 +238,12 @@ export class GalleryPage {
     backBtn.innerHTML      = ICON_BACK;
     track.appendChild(backBtn);
 
-    // Divider visual
-    const div = document.createElement('span');
-    div.className = 'filter-divider';
-    track.appendChild(div);
+    // Divider
+    const divider = document.createElement('span');
+    divider.className = 'filter-divider';
+    track.appendChild(divider);
 
-    // "All" characters
+    // Tombol "All"
     const allBtn = document.createElement('button');
     allBtn.className      = 'filter-btn' + (this.#selectedChar === 'all' ? ' active' : '');
     allBtn.dataset.action = 'char';
@@ -221,8 +251,9 @@ export class GalleryPage {
     allBtn.textContent    = 'All';
     track.appendChild(allBtn);
 
-    // Per-character buttons
-    GALLERY.filter(i => i.category === this.#selectedAnime).forEach(({ id, label }) => {
+    // Tombol per karakter
+    const chars = GALLERY.filter(i => i.category === this.#selectedAnime);
+    chars.forEach(({ id, label }) => {
       const btn = document.createElement('button');
       btn.className      = 'filter-btn' + (String(id) === this.#selectedChar ? ' active' : '');
       btn.dataset.action = 'char';
